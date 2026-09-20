@@ -9,7 +9,6 @@ import {
   KeyRound,
   Leaf,
   Mail,
-  MessageCircle,
   Minus,
   Music2,
   Plus,
@@ -514,7 +513,6 @@ function CartDrawer(props: {
   async function placeOrder() {
     setPlacing(true);
     const updating = Boolean(props.activeOrderId);
-    const whatsappWindow = props.cafe.whatsappUrl ? window.open("about:blank", "_blank") : null;
     const res = await fetch(updating ? "/api/orders/add-items" : "/api/orders", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -544,23 +542,8 @@ function CartDrawer(props: {
       props.setCart([]);
       setOrderId(data.order.id);
       props.onActiveOrder(data.order.id);
-      const whatsappUrl = props.cafe.whatsappUrl;
-      if (whatsappUrl) {
-        const itemSummary = props.cart.map((item) => `${item.quantity} x ${item.name}`).join(", ");
-        const location = props.contextType === "TAKEAWAY" ? "Takeaway" : `Table ${props.tableNumber}`;
-        const message = `New order ${data.order.id} - ${location}. Items: ${itemSummary}. Total: ${paise(props.totals.totalPaise)}.`;
-        const separator = whatsappUrl.includes("?") ? "&" : "?";
-        const whatsappLink = `${whatsappUrl}${separator}text=${encodeURIComponent(message)}`;
-        if (whatsappWindow) {
-          whatsappWindow.location.href = whatsappLink;
-        } else {
-          window.open(whatsappLink, "_blank", "noopener,noreferrer");
-        }
-      } else {
-        whatsappWindow?.close();
-      }
+
     } else {
-      whatsappWindow?.close();
       alert(data.error || "Order failed");
     }
   }
@@ -669,7 +652,6 @@ function SocialDock({ cafe }: { cafe: Omit<Cafe, "ownerPasswordHash"> }) {
   const links = [
     { href: cafe.instagramUrl, icon: Instagram, label: "Instagram", iconClass: "text-[#E4405F]" },
     { href: cafe.facebookUrl, icon: Facebook, label: "Facebook", iconClass: "text-[#1877F2]" },
-    { href: cafe.whatsappUrl, icon: MessageCircle, label: "WhatsApp", iconClass: "text-[#25D366]" }
   ].filter((link) => link.href);
   return (
     <nav className="fixed bottom-4 left-1/2 z-40 flex -translate-x-1/2 gap-2 rounded-full border border-[#f0dfcd] bg-white/85 p-2 shadow-xl backdrop-blur">
