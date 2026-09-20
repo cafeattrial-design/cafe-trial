@@ -1,0 +1,174 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #fffaf4;
+  color: #1f2933;
+  font-family: "DM Sans", system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: "Playfair Display", Georgia, serif;
+}
+
+.hero-kenburns {
+  animation: hero-kenburns 7s ease-out forwards;
+}
+
+.tea-noise {
+  background-image:
+    radial-gradient(circle at 16% 18%, rgba(233, 79, 55, 0.22), transparent 24%),
+    radial-gradient(circle at 88% 82%, rgba(255, 177, 153, 0.12), transparent 22%);
+}
+
+.tea-wheel {
+  background: conic-gradient(
+    #e94f37 0deg 45deg,
+    #7f2b1e 45deg 90deg,
+    #e5a750 90deg 135deg,
+    #313d34 135deg 180deg,
+    #e94f37 180deg 225deg,
+    #7f2b1e 225deg 270deg,
+    #e5a750 270deg 315deg,
+    #313d34 315deg 360deg
+  );
+}
+
+.tea-confetti {
+  background-image:
+    radial-gradient(circle, #ffb199 0 3px, transparent 4px),
+    radial-gradient(circle, #e5a750 0 3px, transparent 4px),
+    radial-gradient(circle, #e94f37 0 3px, transparent 4px);
+  background-position: 12% 18%, 82% 22%, 65% 78%;
+  background-size: 90px 110px, 120px 140px, 140px 100px;
+  animation: tea-confetti 2.6s ease-out infinite;
+  opacity: 0.65;
+}
+
+@keyframes tea-confetti {
+  0%, 100% { transform: translateY(8px) rotate(0deg); opacity: 0.25; }
+  50% { transform: translateY(-10px) rotate(3deg); opacity: 0.8; }
+}
+
+.tea-chat-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 177, 153, 0.45) transparent;
+}
+
+.voice-bars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 12px;
+}
+
+.voice-bars i {
+  display: block;
+  width: 2px;
+  height: 5px;
+  border-radius: 999px;
+  background: currentColor;
+  animation: voice-bar 0.7s ease-in-out infinite alternate;
+}
+
+.voice-bars i:nth-child(2) { animation-delay: 0.18s; }
+.voice-bars i:nth-child(3) { animation-delay: 0.36s; }
+
+@keyframes voice-bar {
+  to { height: 12px; }
+}
+
+.dish-showcase {
+  perspective: 900px;
+}
+
+.dish-showcase img {
+  animation: dish-showcase 14s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+.dish-showcase:hover img {
+  animation-play-state: paused;
+}
+
+@keyframes dish-showcase {
+  0%, 14% { transform: rotateY(0deg) scale(1.02); }
+  48%, 62% { transform: rotateY(180deg) scale(1.04); }
+  86%, 100% { transform: rotateY(360deg) scale(1.02); }
+}
+
+@keyframes hero-kenburns {
+  from {
+    transform: scale(1.03) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.12) translate3d(-1.5%, -1%, 0);
+  }
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(31, 41, 51, 0.1);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 24px 70px rgba(31, 41, 51, 0.14);
+}
+
+.tool-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(31, 41, 51, 0.12);
+  background: rgba(255, 255, 255, 0.74);
+  color: #1f2933;
+  box-shadow: 0 10px 26px rgba(31, 41, 51, 0.08);
+}
+
+.field {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(31, 41, 51, 0.14);
+  background: rgba(255, 255, 255, 0.92);
+  padding: 0.85rem 1rem;
+  color: #1f2933;
+  outline: none;
+}
+
+.field:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

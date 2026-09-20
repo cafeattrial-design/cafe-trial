@@ -1,0 +1,232 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Cafe {
+  id                  String   @id @default(cuid())
+  slug                String   @unique
+  name                String
+  email               String
+  logoUrl             String?
+  address             String
+  instagramUrl        String?
+  facebookUrl         String?
+  whatsappUrl         String?
+  smtpHost            String?
+  smtpPort            Int?
+  smtpUser            String?
+  smtpEncryptedPass   String?
+  ownerPasswordHash   String
+  trialStart          DateTime
+  trialEnd            DateTime
+  suspended           Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  menuItems           MenuItem[]
+  tables              CafeTable[]
+  orders              Order[]
+  reviews             Review[]
+  activeSessions      ActiveTableSession[]
+  loyaltyStamps       LoyaltyStamp[]
+  customerProfiles    CustomerProfile[]
+  gameConfig          GameConfig?
+  games               Game[]
+  teaPosts            TeaPost[]
+}
+
+model TeaPost {
+  id             String   @id @default(cuid())
+  cafeId         String
+  category       String
+  text           String   @db.Text
+  audioDataUrl   String?  @db.Text
+  receiptDataUrl String?  @db.Text
+  fireCount      Int      @default(0)
+  shockCount     Int      @default(0)
+  laughCount     Int      @default(0)
+  status         String   @default("PENDING")
+  createdAt      DateTime @default(now())
+  cafe           Cafe     @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+
+  @@index([cafeId, status, createdAt])
+}
+
+model CafeTable {
+  id        String @id @default(cuid())
+  cafeId    String
+  number    String
+  cafe      Cafe   @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+  @@unique([cafeId, number])
+}
+
+model MenuItem {
+  id          String   @id @default(cuid())
+  cafeId      String
+  name        String
+  category    String
+  description String
+  imageUrl     String
+  pricePaise  Int
+  pureVeg     Boolean  @default(true)
+  highMargin  Boolean  @default(false)
+  available   Boolean  @default(true)
+  aiVoiceText String?  // AI voice description of the food item
+  cafe        Cafe     @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+  reviews     Review[]
+}
+
+model ActiveTableSession {
+  id             String   @id @default(cuid())
+  cafeId         String
+  tableNumber    String
+  tokenHash      String
+  orderId        String?
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+  cafe           Cafe     @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+  @@unique([cafeId, tableNumber])
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  cafeId        String
+  customerEmail String
+  customerName  String
+  contextType   OrderContext
+  tableNumber   String?
+  status        OrderStatus @default(LIVE)
+  subtotalPaise Int
+  taxPaise      Int
+  totalPaise    Int
+  paymentMethod PaymentMethod?
+  paidAt        DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  cafe          Cafe        @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id             String @id @default(cuid())
+  orderId        String
+  menuItemId     String
+  name           String
+  quantity       Int
+  unitPricePaise Int
+  exclusions     String[]
+  addOns         String[]
+  notes          String?
+  order          Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id            String   @id @default(cuid())
+  cafeId        String
+  menuItemId    String
+  customerEmail String
+  rating        Int
+  body          String
+  createdAt     DateTime @default(now())
+  cafe          Cafe     @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+  menuItem      MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+}
+
+model LoyaltyStamp {
+  id            String   @id @default(cuid())
+  cafeId        String
+  customerEmail String
+  visits        Int      @default(1)
+  updatedAt     DateTime @updatedAt
+  cafe          Cafe     @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+  @@unique([cafeId, customerEmail])
+}
+
+model CustomerProfile {
+  id              String   @id @default(cuid())
+  cafeId          String
+  email           String
+  name            String
+  membershipTier  String   @default("basic") // basic, silver, gold, platinum
+  gamesPlayedToday Int    @default(0)
+  totalDiscountEarned Int @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  cafe            Cafe     @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+  gamePlays       GamePlay[]
+  @@unique([cafeId, email])
+}
+
+model GameConfig {
+  id                     String   @id @default(cuid())
+  cafeId                 String   @unique
+  gamesPerCustomerDaily  Int      @default(2)
+  minDiscountPercentage  Int      @default(5)
+  maxDiscountPercentage  Int      @default(30)
+  maxDiscountValue       Int      @default(5000) // in paise
+  basicTierMultiplier    Float    @default(1.0)
+  silverTierMultiplier   Float    @default(1.5)
+  goldTierMultiplier     Float    @default(2.0)
+  platinumTierMultiplier Float   @default(3.0)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  cafe                   Cafe     @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+}
+
+model Game {
+  id           String @id @default(cuid())
+  cafeId       String
+  name         String
+  description  String
+  gameType     String // "wheel", "dice", "cards", "spin"
+  isActive     Boolean @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  cafe         Cafe   @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+  plays        GamePlay[]
+}
+
+model GamePlay {
+  id                String   @id @default(cuid())
+  gameId            String
+  cafeId            String
+  customerProfileId String
+  won               Boolean
+  discountPercentage Int    @default(0)
+  discountValue     Int    @default(0) // in paise
+  appliedToOrder    String? // orderId if discount was applied
+  playedAt          DateTime @default(now())
+  game              Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  customerProfile   CustomerProfile @relation(fields: [customerProfileId], references: [id], onDelete: Cascade)
+}
+
+model OtpChallenge {
+  id        String   @id @default(cuid())
+  cafeId    String
+  codeHash  String
+  expiresAt DateTime
+  consumed  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+enum OrderContext {
+  TABLE
+  TAKEAWAY
+}
+
+enum OrderStatus {
+  LIVE
+  BILLING_PENDING
+  PAID
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  UPI
+  CARD
+}
