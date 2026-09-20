@@ -28,6 +28,8 @@ type SuperAdminOtp = {
 };
 
 const ownerPasswordHash = process.env.D_TREAT_OWNER_PASSWORD_HASH || bcrypt.hashSync(randomToken(), 12);
+const seededTrialStart = new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString();
+const seededTrialEnd = process.env.D_TREAT_TRIAL_END || new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString();
 
 const seededCafes: Cafe[] = [
   {
@@ -40,8 +42,8 @@ const seededCafes: Cafe[] = [
     facebookUrl: "https://facebook.com",
     whatsappUrl: "https://wa.me/919999999999",
     tables: Array.from({ length: 12 }, (_, index) => String(index + 1)),
-    trialStart: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
-    trialEnd: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString(),
+    trialStart: seededTrialStart,
+    trialEnd: seededTrialEnd,
     suspended: false,
     ownerPasswordHash
   }
